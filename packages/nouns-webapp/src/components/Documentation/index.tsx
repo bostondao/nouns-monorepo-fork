@@ -50,7 +50,7 @@ const Documentation = () => {
                 like any structure without proper care, ideal systems rust and wither. We believe
                 the time has come to innovate once again. We aim to accelerate the adoption of
                 decentralized technology and governance, ultimately educating and indoctrinating
-                more like-minded individuals to our community and to the{' '}
+                more like-minded individuals to our community and to the
                 <span className={classes.boldText}>Web3 World</span>.
               </Trans>
             </li>
@@ -90,7 +90,7 @@ const Documentation = () => {
                 will embody the following values, ranked in their respective order, for when
                 conflict occurs:
               </Trans>
-            </li>{' '}
+            </li>
           </ol>
           <Accordion flush>
             <Accordion.Item eventKey="a" className={classes.accordionItem}>
@@ -173,7 +173,7 @@ const Documentation = () => {
                   industry and the  broader governing body.   ii. As benefactors of a hyperbolic
                   asset class, we seek to direct resources towards less hyperbolic asset classes,
                   namely the non-profit industry. As a DAO, we aim to  develop a roadmap for
-                  compliant and effective benevolence.{' '}
+                  compliant and effective benevolence.
                 </Trans>
               </p>
             </Accordion.Body>
@@ -195,12 +195,12 @@ const Documentation = () => {
                 <li>
                   <Trans>
                     We believe that conferences are positive-sum for the Boston ecosystem,
-                    optimizing network effects and education globally.{' '}
+                    optimizing network effects and education globally.
                   </Trans>
                 </li>
                 <li>
                   <Trans>
-                    We want to bring the most desirable crypto conferences back to Boston.{' '}
+                    We want to bring the most desirable crypto conferences back to Boston.
                   </Trans>
                 </li>
               </ol>
@@ -247,7 +247,7 @@ const Documentation = () => {
               community, we embrace the duality of nature: an idyllic optimism in summer held in
               tandem with a stoic persevering temperament through winter, but with constant progress
               forward. This mentality begets achievement and, as Bostonians in mindset, we intend to
-              sustain this tradition of achievement. Our objectives are simple:{' '}
+              sustain this tradition of achievement. Our objectives are simple:
             </Trans>
           </p>
         </div>
