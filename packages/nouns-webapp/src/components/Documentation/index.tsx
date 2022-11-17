@@ -92,8 +92,150 @@ const Documentation = () => {
               </Trans>
             </li>{' '}
           </ol>
+          <Accordion flush>
+            <Accordion.Item eventKey="a" className={classes.accordionItem}>
+              <Accordion.Header className={classes.accordionHeader}>
+                <Trans>By the community, for the community</Trans>
+              </Accordion.Header>
+              <Accordion.Body>
+                <Trans>
+                  We always want to further our mission; we want to build an ever-expanding and
+                  inclusive community in Boston. Our community will leverage network effects to
+                  increasingly provide more benefits to our members by sharing resources,
+                  connections, and ideas. We aim to make The Boston DAO and our city, Boston, a
+                  welcoming and bountiful epicenter for the coming of the new internet.
+                </Trans>
+              </Accordion.Body>
+            </Accordion.Item>
+            <Accordion.Item eventKey="b" className={classes.accordionItem}>
+              <Accordion.Header className={classes.accordionHeader}>
+                <Trans>Innovative, positive, and exceptional</Trans>
+              </Accordion.Header>
+              <Accordion.Body>
+                <Trans>
+                  Do things that are new, positive-sum, and disruptive so that people who learn
+                  about us can leverage and improve our framework — this is how we grow. We stand
+                  for Boston and Boston stands for trailblazing, pioneering revolutionists. This
+                  Manifesto is no exception; it should evolve with the DAO.
+                </Trans>
+              </Accordion.Body>
+            </Accordion.Item>
+            <Accordion.Item eventKey="c" className={classes.accordionItem}>
+              <Accordion.Header className={classes.accordionHeader}>
+                <Trans>Open, transparent, and adaptable</Trans>
+              </Accordion.Header>
+              <Accordion.Body>
+                <Trans>
+                  We believe that the future of governance involves operating publicly and
+                  deliberately. Rather than assuming an uneducated majority, we seek to educate the
+                  majority.
+                </Trans>
+              </Accordion.Body>
+            </Accordion.Item>
+            <Accordion.Item eventKey="d" className={classes.accordionItem}>
+              <Accordion.Header className={classes.accordionHeader}>
+                <Trans>Inclusive and diverse</Trans>
+              </Accordion.Header>
+              <Accordion.Body>
+                <Trans>
+                  The Boston DAO is holistically meritocratic — understanding that every decision is
+                  not black and white, but also pushing to innovate and govern in a truly digital
+                  world.
+                </Trans>
+              </Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
         </div>
       </Col>
+      {/* Our focus */}
+      <Col lg={{ span: 10, offset: 1 }}>
+        <div className={classes.headerWrapper}>
+          <h1>
+            <Trans>Our Focus</Trans>
+          </h1>
+          <p className={classes.aboutText} style={{ paddingBottom: '4rem' }}>
+            <Trans>
+              All great organizations effectively leverage their values into meaningful actions. As
+              an  organization, we initially seek to impact the world in three areas:
+            </Trans>
+          </p>
+        </div>
+        <Accordion flush>
+          <Accordion.Item eventKey="99" className={classes.accordionItem}>
+            <Accordion.Header className={classes.accordionHeader}>
+              <Trans>Policy & Philanthropy</Trans>
+            </Accordion.Header>
+            <Accordion.Body>
+              <p>
+                <Trans>
+                  As members of one of the most influential states in the United States, we
+                  advocate, advise and support any policy that is beneficial for both the crypto
+                  industry and the  broader governing body.   ii. As benefactors of a hyperbolic
+                  asset class, we seek to direct resources towards less hyperbolic asset classes,
+                  namely the non-profit industry. As a DAO, we aim to  develop a roadmap for
+                  compliant and effective benevolence.{' '}
+                </Trans>
+              </p>
+            </Accordion.Body>
+          </Accordion.Item>
+          <Accordion.Item eventKey="1" className={classes.accordionItem}>
+            <Accordion.Header className={classes.accordionHeader}>
+              <Trans>Conferences & Gatherings</Trans>
+            </Accordion.Header>
+            <Accordion.Body>
+              <ol>
+                <li>
+                  <Trans>
+                    Boston’s largest export is knowledge. As an organization, we strive to bolster
+                    this great city by directing human and financial resources toward educating
+                    policymakers, students, and individuals like ourselves that are constantly
+                    seeking to learn more.
+                  </Trans>
+                </li>
+                <li>
+                  <Trans>
+                    We believe that conferences are positive-sum for the Boston ecosystem,
+                    optimizing network effects and education globally.{' '}
+                  </Trans>
+                </li>
+                <li>
+                  <Trans>
+                    We want to bring the most desirable crypto conferences back to Boston.{' '}
+                  </Trans>
+                </li>
+              </ol>
+            </Accordion.Body>
+          </Accordion.Item>
+          <Accordion.Item eventKey="1" className={classes.accordionItem}>
+            <Accordion.Header className={classes.accordionHeader}>
+              <Trans>Partnering, Mentoring & Funding</Trans>
+            </Accordion.Header>
+            <Accordion.Body>
+              <ol>
+                <li>
+                  <Trans>
+                    The Boston network is rich and deep. We believe that we can leverage this to
+                    make Boston and the world an extension a better place to live.
+                  </Trans>
+                </li>
+                <li>
+                  <Trans>
+                    We welcome any crypto-entrepreneur or crypto-investor to join and contribute to
+                    our network.
+                  </Trans>
+                </li>
+                <li>
+                  <Trans>
+                    We strive to direct resources (financial and non-financial) towards individuals,
+                    companies, or networks advancing and embodying our ideals.
+                  </Trans>
+                </li>
+              </ol>
+            </Accordion.Body>
+          </Accordion.Item>
+        </Accordion>
+      </Col>
+      {/* Our objectives */}
       <Col lg={{ span: 10, offset: 1 }}>
         <div className={classes.headerWrapper}>
           <h1>
