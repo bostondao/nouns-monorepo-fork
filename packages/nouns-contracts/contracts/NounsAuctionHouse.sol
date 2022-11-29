@@ -32,7 +32,12 @@ import { INounsAuctionHouse } from './interfaces/INounsAuctionHouse.sol';
 import { INounsToken } from './interfaces/INounsToken.sol';
 import { IWETH } from './interfaces/IWETH.sol';
 
+import './BostonManager.sol';
+
 contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, ReentrancyGuardUpgradeable, OwnableUpgradeable {
+    // Boston DAO Manager
+    BostonManager private bostonManagerAddress;
+
     // The Nouns ERC721 token contract
     INounsToken public nouns;
 
@@ -63,9 +68,9 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
         INounsToken _nouns,
         address _weth,
         uint256 _timeBuffer,
-        uint256 _reservePrice,
         uint8 _minBidIncrementPercentage,
-        uint256 _duration
+        uint256 _duration,
+        BostonManager _bostonManagerAddress
     ) external initializer {
         __Pausable_init();
         __ReentrancyGuard_init();
@@ -76,9 +81,9 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
         nouns = _nouns;
         weth = _weth;
         timeBuffer = _timeBuffer;
-        reservePrice = _reservePrice;
         minBidIncrementPercentage = _minBidIncrementPercentage;
         duration = _duration;
+        bostonManagerAddress = _bostonManagerAddress;
     }
 
     /**
