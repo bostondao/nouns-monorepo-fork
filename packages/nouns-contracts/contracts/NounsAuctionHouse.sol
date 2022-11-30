@@ -45,16 +45,16 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
     address public weth;
 
     // The minimum amount of time left in an auction after a new bid is created
-    uint256 public timeBuffer;
+    uint256 public timeBuffer = bostonManagerAddress.getTimeBuffer();
 
     // The minimum price accepted in an auction
-    uint256 public reservePrice;
+    uint256 public reservePrice = bostonManagerAddress.getReservePrice();
 
     // The minimum percentage difference between the last bid amount and the current bid
-    uint8 public minBidIncrementPercentage;
+    uint8 public minBidIncrementPercentage = bostonManagerAddress.getMinBidIncrementPercentage();
 
     // The duration of a single auction
-    uint256 public duration;
+    uint256 public duration = bostonManagerAddress.getDuration();
 
     // The active auction
     INounsAuctionHouse.Auction public auction;
@@ -176,6 +176,8 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
     /**
      * @notice Set the auction reserve price.
      * @dev Only callable by the owner.
+     *
+     * Pretty sure we can remove this
      */
     function setReservePrice(uint256 _reservePrice) external override onlyOwner {
         reservePrice = _reservePrice;
