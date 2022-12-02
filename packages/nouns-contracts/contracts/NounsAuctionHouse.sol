@@ -45,16 +45,16 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
     address public weth;
 
     // The minimum amount of time left in an auction after a new bid is created
-    uint256 public timeBuffer = bostonManagerAddress.getTimeBuffer();
+    uint256 public timeBuffer = bostonManagerAddress.timeBuffer();
 
     // The minimum price accepted in an auction
-    uint256 public reservePrice = bostonManagerAddress.getReservePrice();
+    uint256 public reservePrice = bostonManagerAddress.reservePrice();
 
     // The minimum percentage difference between the last bid amount and the current bid
-    uint8 public minBidIncrementPercentage = bostonManagerAddress.getMinBidIncrementPercentage();
+    uint8 public minBidIncrementPercentage = bostonManagerAddress.minBidIncrementPercentage();
 
     // The duration of a single auction
-    uint256 public duration = bostonManagerAddress.getDuration();
+    uint256 public duration = bostonManagerAddress.duration();
 
     // The active auction
     INounsAuctionHouse.Auction public auction;
