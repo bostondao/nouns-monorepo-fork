@@ -14,26 +14,5 @@ contract BostonManager {
         duration = _duration;
         timeBuffer = _timeBuffer;
     }
-
-    // Returns reservePrice
-    function getReservePrice() public view returns (uint256) {
-        return reservePrice;
-    }
-
-    // returns minBidIncrementPercentage
-    function getMinBidIncrementPercentage() public view returns (uint8) {
-        return minBidIncrementPercentage;
-    }
-
-    // Returns duration of auction
-    function getDuration() public view returns (uint256) {
-        return duration;
-    }
-
-    // Returns timeBuffer
-    function getTimeBuffer() public view returns (uint256) {
-        return timeBuffer;
-    }
-
     // TODO: set reserve price based on if caller is owner (Boston DAO)
 }
