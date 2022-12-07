@@ -28,6 +28,7 @@ import { usePickByState } from '../../utils/colorResponsiveUIUtils';
 import { ReactComponent as Noggles } from '../../assets/icons/Noggles.svg';
 import { useTreasuryBalance } from '../../hooks/useTreasuryBalance';
 import clsx from 'clsx';
+import BostonDAOLogo from '../BostonDAOLogo';
 
 const NavBar = () => {
   const activeAccount = useAppSelector(state => state.account.activeAccount);
@@ -62,7 +63,9 @@ const NavBar = () => {
         <Container style={{ maxWidth: 'unset' }}>
           <div className={classes.brandAndTreasuryWrapper}>
             <Navbar.Brand as={Link} to="/" className={classes.navBarBrand}>
-              <img src={noggles} className={classes.navBarLogo} alt="Nouns DAO noggles" />
+              <div className={classes.navBarLogo}>
+                <BostonDAOLogo />
+              </div>
             </Navbar.Brand>
             {Number(CHAIN_ID) !== 1 && (
               <Nav.Item>
