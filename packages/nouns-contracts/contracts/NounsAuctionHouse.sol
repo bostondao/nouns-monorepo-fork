@@ -24,6 +24,8 @@
 
 pragma solidity ^0.8.6;
 
+import "@openzeppelin/contracts/access/AccessControl.sol";
+
 import { PausableUpgradeable } from '@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol';
 import { ReentrancyGuardUpgradeable } from '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
 import { OwnableUpgradeable } from '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
@@ -32,7 +34,7 @@ import { INounsAuctionHouse } from './interfaces/INounsAuctionHouse.sol';
 import { INounsToken } from './interfaces/INounsToken.sol';
 import { IWETH } from './interfaces/IWETH.sol';
 
-contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, ReentrancyGuardUpgradeable, OwnableUpgradeable {
+contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, ReentrancyGuardUpgradeable, OwnableUpgradeable, AccessControl {
     // The Nouns ERC721 token contract
     INounsToken public nouns;
 
@@ -79,6 +81,7 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
         reservePrice = _reservePrice;
         minBidIncrementPercentage = _minBidIncrementPercentage;
         duration = _duration;
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
     /**
@@ -162,7 +165,8 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
      * @notice Set the auction time buffer.
      * @dev Only callable by the owner.
      */
-    function setTimeBuffer(uint256 _timeBuffer) external override onlyOwner {
+    function setTimeBuffer(uint256 _timeBuffer) external override {
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Caller is not an admin");
         timeBuffer = _timeBuffer;
 
         emit AuctionTimeBufferUpdated(_timeBuffer);
@@ -172,7 +176,8 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
      * @notice Set the auction reserve price.
      * @dev Only callable by the owner.
      */
-    function setReservePrice(uint256 _reservePrice) external override onlyOwner {
+    function setReservePrice(uint256 _reservePrice) external override {
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Caller is not an admin");
         reservePrice = _reservePrice;
 
         emit AuctionReservePriceUpdated(_reservePrice);
@@ -182,7 +187,8 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
      * @notice Set the auction minimum bid increment percentage.
      * @dev Only callable by the owner.
      */
-    function setMinBidIncrementPercentage(uint8 _minBidIncrementPercentage) external override onlyOwner {
+    function setMinBidIncrementPercentage(uint8 _minBidIncrementPercentage) external override {
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Caller is not an admin");
         minBidIncrementPercentage = _minBidIncrementPercentage;
 
         emit AuctionMinBidIncrementPercentageUpdated(_minBidIncrementPercentage);
@@ -192,7 +198,8 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
      * @notice Set the duration of an auction.
      * @dev Only callable by the owner.
      */
-    function setDuration(uint256 _duration) external override onlyOwner {
+    function setDuration(uint256 _duration) external override {
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Caller is not an admin");
         duration = _duration;
 
         emit AuctionDurationUpdated(_duration);
