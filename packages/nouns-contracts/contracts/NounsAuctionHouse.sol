@@ -55,6 +55,9 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
     // The duration of a single auction
     uint256 public duration;
 
+    // The role to modify contract variables
+    bytes32 public constant BRAVO_OR_OWNER = keccak256("bravoOrOwner");
+
     // The active auction
     INounsAuctionHouse.Auction public auction;
 
@@ -84,7 +87,7 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
         reservePrice = _reservePrice;
         minBidIncrementPercentage = _minBidIncrementPercentage;
         duration = _duration;
-        _setupRole(DEFAULT_ADMIN_ROLE, _executor);
+        _setupRole(BRAVO_OR_OWNER, _executor);
     }
 
     /**
@@ -169,7 +172,7 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
      * @dev Only callable by the owner.
      */
     function setTimeBuffer(uint256 _timeBuffer) external override {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Caller is not an admin");
+        require(hasRole(BRAVO_OR_OWNER, msg.sender), "Caller is not an admin");
         timeBuffer = _timeBuffer;
 
         emit AuctionTimeBufferUpdated(_timeBuffer);
@@ -180,7 +183,7 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
      * @dev Only callable by the owner.
      */
     function setReservePrice(uint256 _reservePrice) external override {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Caller is not an admin");
+        require(hasRole(BRAVO_OR_OWNER, msg.sender), "Caller is not an admin");
         reservePrice = _reservePrice;
 
         emit AuctionReservePriceUpdated(_reservePrice);
@@ -191,7 +194,7 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
      * @dev Only callable by the owner.
      */
     function setMinBidIncrementPercentage(uint8 _minBidIncrementPercentage) external override {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Caller is not an admin");
+        require(hasRole(BRAVO_OR_OWNER, msg.sender), "Caller is not an admin");
         minBidIncrementPercentage = _minBidIncrementPercentage;
 
         emit AuctionMinBidIncrementPercentageUpdated(_minBidIncrementPercentage);
@@ -202,7 +205,7 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
      * @dev Only callable by the owner.
      */
     function setDuration(uint256 _duration) external override {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Caller is not an admin");
+        require(hasRole(BRAVO_OR_OWNER, msg.sender), "Caller is not an admin");
         duration = _duration;
 
         emit AuctionDurationUpdated(_duration);
