@@ -24,10 +24,6 @@
 
 pragma solidity ^0.8.6;
 
-import { AccessControlUpgradeable } from '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol';
-import { PausableUpgradeable } from '@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol';
-import { ReentrancyGuardUpgradeable } from '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
-import { OwnableUpgradeable } from '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import { PausableUpgradeable } from '@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol';
 import { ReentrancyGuardUpgradeable } from '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
 import { OwnableUpgradeable } from '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
@@ -36,7 +32,7 @@ import { INounsAuctionHouse } from './interfaces/INounsAuctionHouse.sol';
 import { INounsToken } from './interfaces/INounsToken.sol';
 import { IWETH } from './interfaces/IWETH.sol';
 
-contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, ReentrancyGuardUpgradeable, OwnableUpgradeable, AccessControlUpgradeable {
+contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, ReentrancyGuardUpgradeable, OwnableUpgradeable {
     // The Nouns ERC721 token contract
     INounsToken public nouns;
 
@@ -58,6 +54,9 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
     // The role to modify contract variables
     bytes32 public constant BRAVO_OR_OWNER = keccak256("bravoOrOwner");
 
+    // The address of the Govenor Bravo executor address
+    address public immutable executorAddress;
+
     // The active auction
     INounsAuctionHouse.Auction public auction;
 
@@ -73,7 +72,7 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
         uint256 _reservePrice,
         uint8 _minBidIncrementPercentage,
         uint256 _duration,
-        address _executor
+        address _executorAddress
     ) external initializer {
         __Pausable_init();
         __ReentrancyGuard_init();
@@ -87,7 +86,16 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
         reservePrice = _reservePrice;
         minBidIncrementPercentage = _minBidIncrementPercentage;
         duration = _duration;
-        _setupRole(BRAVO_OR_OWNER, _executor);
+        executorAddress = _executorAddress;
+    }
+
+    modifier onlyBravoOrOwner() {
+        checkBravoOrOwner ();
+        _;
+    }
+    
+    function checkBravoOrOwner() internal view virtual {
+        require(msg.sender == owner() || msg.sender == executorAddress, "Caller is not bravo or owner");
     }
 
     /**
@@ -171,8 +179,7 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
      * @notice Set the auction time buffer.
      * @dev Only callable by the owner.
      */
-    function setTimeBuffer(uint256 _timeBuffer) external override {
-        require(hasRole(BRAVO_OR_OWNER, msg.sender), "Caller is not an admin");
+    function setTimeBuffer(uint256 _timeBuffer) external override onlyBravoOrOwner{
         timeBuffer = _timeBuffer;
 
         emit AuctionTimeBufferUpdated(_timeBuffer);
@@ -182,8 +189,7 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
      * @notice Set the auction reserve price.
      * @dev Only callable by the owner.
      */
-    function setReservePrice(uint256 _reservePrice) external override {
-        require(hasRole(BRAVO_OR_OWNER, msg.sender), "Caller is not an admin");
+    function setReservePrice(uint256 _reservePrice) external override onlyBravoOrOwner {
         reservePrice = _reservePrice;
 
         emit AuctionReservePriceUpdated(_reservePrice);
@@ -193,8 +199,7 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
      * @notice Set the auction minimum bid increment percentage.
      * @dev Only callable by the owner.
      */
-    function setMinBidIncrementPercentage(uint8 _minBidIncrementPercentage) external override {
-        require(hasRole(BRAVO_OR_OWNER, msg.sender), "Caller is not an admin");
+    function setMinBidIncrementPercentage(uint8 _minBidIncrementPercentage) external override onlyBravoOrOwner{
         minBidIncrementPercentage = _minBidIncrementPercentage;
 
         emit AuctionMinBidIncrementPercentageUpdated(_minBidIncrementPercentage);
@@ -204,8 +209,7 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
      * @notice Set the duration of an auction.
      * @dev Only callable by the owner.
      */
-    function setDuration(uint256 _duration) external override {
-        require(hasRole(BRAVO_OR_OWNER, msg.sender), "Caller is not an admin");
+    function setDuration(uint256 _duration) external override onlyBravoOrOwner {
         duration = _duration;
 
         emit AuctionDurationUpdated(_duration);
