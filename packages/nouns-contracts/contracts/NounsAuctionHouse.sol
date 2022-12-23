@@ -55,7 +55,7 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
     bytes32 public constant BRAVO_OR_OWNER = keccak256("bravoOrOwner");
 
     // The address of the Govenor Bravo executor address
-    address public immutable executorAddress;
+    address public executorAddress;
 
     // The active auction
     INounsAuctionHouse.Auction public auction;
