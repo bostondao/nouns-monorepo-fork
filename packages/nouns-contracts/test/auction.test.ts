@@ -325,4 +325,23 @@ describe('NounsAuctionHouse', () => {
       .to.emit(nounsAuctionHouse, 'AuctionSettled')
       .withArgs(nounId, '0x0000000000000000000000000000000000000000', 0);
   });
+  it('verify duration change from owner', async () => {
+    await (await nounsAuctionHouse.unpause()).wait();
+
+    let prevDuration = await nounsAuctionHouse.duration();
+    await (await nounsAuctionHouse.setDuration(prevDuration.add(1))).wait();
+    let newDuration = await nounsAuctionHouse.duration();
+    await expect(newDuration).to.be.equal(prevDuration.add(1))
+
+    await bidderA
+
+  });
+  it('Verify duration change not available for non-owner', async () => {
+    await (await nounsAuctionHouse.unpause()).wait();
+
+    let prevDuration = await nounsAuctionHouse.duration();
+    const tx = nounsAuctionHouse.connect(bidderA).setDuration(prevDuration.add(1));
+    await expect(tx).to.be.revertedWith("Ownable: caller is not the owner");
+  });
+
 });
