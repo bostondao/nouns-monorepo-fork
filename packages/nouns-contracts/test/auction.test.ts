@@ -29,6 +29,8 @@ describe('NounsAuctionHouse', () => {
   const RESERVE_PRICE = 2;
   const MIN_INCREMENT_BID_PERCENTAGE = 5;
   const DURATION = 60 * 60 * 24;
+  // Address of Govenor Bravo executor
+  const EXECUTOR = `0x308112D06027Cd838627b94dDFC16ea6B4D90004`;
 
   async function deploy(deployer?: SignerWithAddress) {
     const auctionHouseFactory = await ethers.getContractFactory('NounsAuctionHouse', deployer);
@@ -72,6 +74,7 @@ describe('NounsAuctionHouse', () => {
       RESERVE_PRICE,
       MIN_INCREMENT_BID_PERCENTAGE,
       DURATION,
+      EXECUTOR,
     );
     await expect(tx).to.be.revertedWith('Initializable: contract is already initialized');
   });
@@ -325,4 +328,8 @@ describe('NounsAuctionHouse', () => {
       .to.emit(nounsAuctionHouse, 'AuctionSettled')
       .withArgs(nounId, '0x0000000000000000000000000000000000000000', 0);
   });
+
+  it('should set the duration of an auction', async () => {
+    await (await nounsAuctionHouse.setDuration([60 * 60 * 25])) // sets duration to 25 hours
+  })
 });
