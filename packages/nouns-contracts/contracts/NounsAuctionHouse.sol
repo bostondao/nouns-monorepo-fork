@@ -51,9 +51,6 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
     // The duration of a single auction
     uint256 public duration;
 
-    // The role to modify contract variables
-    bytes32 public constant BRAVO_OR_OWNER = keccak256("bravoOrOwner");
-
     // The address of the Govenor Bravo executor address
     address public executorAddress;
 
