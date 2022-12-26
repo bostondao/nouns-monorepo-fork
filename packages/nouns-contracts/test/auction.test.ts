@@ -32,7 +32,7 @@ describe('NounsAuctionHouse', () => {
   // Address of Govenor Bravo executor
   const EXECUTOR = `0x308112D06027Cd838627b94dDFC16ea6B4D90004`;
 
-  async function deploy(deployer?: SignerWithAddress) {
+  async function deploy(deployer?: SignerWithAddress, executor?: SignerWithAddress) {
     const auctionHouseFactory = await ethers.getContractFactory('NounsAuctionHouse', deployer);
     return upgrades.deployProxy(auctionHouseFactory, [
       nounsToken.address,
@@ -41,6 +41,7 @@ describe('NounsAuctionHouse', () => {
       RESERVE_PRICE,
       MIN_INCREMENT_BID_PERCENTAGE,
       DURATION,
+      executor,
     ]) as Promise<NounsAuctionHouse>;
   }
 
@@ -49,7 +50,7 @@ describe('NounsAuctionHouse', () => {
 
     nounsToken = await deployNounsToken(deployer, noundersDAO.address, deployer.address);
     weth = await deployWeth(deployer);
-    nounsAuctionHouse = await deploy(deployer);
+    nounsAuctionHouse = await deploy(deployer, EXECUTOR);
 
     const descriptor = await nounsToken.descriptor();
 
