@@ -23,6 +23,7 @@ describe('NounsAuctionHouse', () => {
   let noundersDAO: SignerWithAddress;
   let bidderA: SignerWithAddress;
   let bidderB: SignerWithAddress;
+  let executor: SignerWithAddress;
   let snapshotId: number;
 
   const TIME_BUFFER = 15 * 60;
@@ -30,9 +31,8 @@ describe('NounsAuctionHouse', () => {
   const MIN_INCREMENT_BID_PERCENTAGE = 5;
   const DURATION = 60 * 60 * 24;
   // Address of Govenor Bravo executor
-  const EXECUTOR = `0x308112D06027Cd838627b94dDFC16ea6B4D90004`;
 
-  async function deploy(deployer?: SignerWithAddress, executor?: SignerWithAddress) {
+  async function deploy(deployer?: SignerWithAddress) {
     const auctionHouseFactory = await ethers.getContractFactory('NounsAuctionHouse', deployer);
     return upgrades.deployProxy(auctionHouseFactory, [
       nounsToken.address,
@@ -41,16 +41,15 @@ describe('NounsAuctionHouse', () => {
       RESERVE_PRICE,
       MIN_INCREMENT_BID_PERCENTAGE,
       DURATION,
-      executor,
+      executor.address
     ]) as Promise<NounsAuctionHouse>;
   }
 
   before(async () => {
-    [deployer, noundersDAO, bidderA, bidderB] = await ethers.getSigners();
-
+    [deployer, noundersDAO, bidderA, bidderB, executor] = await ethers.getSigners();
     nounsToken = await deployNounsToken(deployer, noundersDAO.address, deployer.address);
     weth = await deployWeth(deployer);
-    nounsAuctionHouse = await deploy(deployer, EXECUTOR);
+    nounsAuctionHouse = await deploy(deployer);
 
     const descriptor = await nounsToken.descriptor();
 
@@ -75,7 +74,7 @@ describe('NounsAuctionHouse', () => {
       RESERVE_PRICE,
       MIN_INCREMENT_BID_PERCENTAGE,
       DURATION,
-      EXECUTOR,
+      executor.address,
     );
     await expect(tx).to.be.revertedWith('Initializable: contract is already initialized');
   });
@@ -331,6 +330,13 @@ describe('NounsAuctionHouse', () => {
   });
 
   it('should set the duration of an auction', async () => {
-    await (await nounsAuctionHouse.setDuration([60 * 60 * 25])) // sets duration to 25 hours
-  })
+    await (await nounsAuctionHouse.unpause()).wait();
+    await (await nounsAuctionHouse.setDuration(60 * 60 * 25)) // sets duration to 25 hours
+    let newDuration = await nounsAuctionHouse.duration();
+    await expect(newDuration).to.be.equal(60 * 60 * 25)
+
+    await nounsAuctionHouse.connect(executor).setDuration(60 * 60 * 26) // sets duration to 26 hours
+    newDuration = await nounsAuctionHouse.duration();
+    await expect(newDuration).to.be.equal(60 * 60 * 26)
+  });
 });
