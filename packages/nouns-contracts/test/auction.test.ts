@@ -30,7 +30,6 @@ describe('NounsAuctionHouse', () => {
   const RESERVE_PRICE = 2;
   const MIN_INCREMENT_BID_PERCENTAGE = 5;
   const DURATION = 60 * 60 * 24;
-  // Address of Govenor Bravo executor
 
   async function deploy(deployer?: SignerWithAddress) {
     const auctionHouseFactory = await ethers.getContractFactory('NounsAuctionHouse', deployer);
