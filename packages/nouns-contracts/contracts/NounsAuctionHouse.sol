@@ -155,7 +155,7 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
      * contract is unpaused. While no new auctions can be started when paused,
      * anyone can settle an ongoing auction.
      */
-    function pause() external override onlyOwner {
+    function pause() external override onlyBravoOrOwner {
         _pause();
     }
 
@@ -164,7 +164,7 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
      * @dev This function can only be called by the owner when the
      * contract is paused. If required, this function will start a new auction.
      */
-    function unpause() external override onlyOwner {
+    function unpause() external override onlyBravoOrOwner {
         _unpause();
 
         if (auction.startTime == 0 || auction.settled) {
