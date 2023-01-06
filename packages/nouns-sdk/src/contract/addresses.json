@@ -33,7 +33,7 @@
     "nounsAuctionHouseProxy": "0x7549dF3081A29b11bAf0eDa1F569291f41D85318",
     "nounsAuctionHouseProxyAdmin": "0xe3C676740180628D0dc01c063FA50048345E0713",
     "nounsDaoExecutor": "0xdA15baC0d8e7a736D24A1d973896628CCA55F03D",
-    "nounsDAOProxyV2": "0x2cb826fcde8047b68d8bf09C4B4AA0ca89C12F4a",
+    "nounsDAOProxy": "0x2cb826fcde8047b68d8bf09C4B4AA0ca89C12F4a",
     "nounsDAOLogicV1": "0x4B245a12e8D449e79120526C350262B587Eb3b7d",
     "nounsDAOLogicV2": "0xba3e308FbbdDF5F0206499dA22b965f23012b884"
   },
