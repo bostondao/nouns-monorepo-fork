@@ -347,4 +347,18 @@ describe('NounsAuctionHouse', () => {
     await expect(tx).to.be.revertedWith("Caller is not bravo or owner");
   });
 
+  it('should set nouns token mintability on pause and unpause', async () => {
+    await (await nounsAuctionHouse.unpause()).wait();
+    let claimable = await nounsToken.airdropClaimable();
+    await expect(claimable).to.equal(false)
+
+    await (await nounsAuctionHouse.pause()).wait();
+    claimable = await nounsToken.airdropClaimable();
+    await expect(claimable).to.equal(true)
+
+    await (await nounsAuctionHouse.unpause()).wait();
+    claimable = await nounsToken.airdropClaimable();
+    await expect(claimable).to.equal(false)
+  });
+
 });

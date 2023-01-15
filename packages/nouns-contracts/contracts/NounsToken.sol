@@ -25,6 +25,7 @@ import { INounsToken } from './interfaces/INounsToken.sol';
 import { ERC721 } from './base/ERC721.sol';
 import { IERC721 } from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import { IProxyRegistry } from './external/opensea/IProxyRegistry.sol';
+import '@openzeppelin/contracts/utils/cryptography/MerkleProof.sol';
 
 contract NounsToken is INounsToken, Ownable, ERC721Checkpointable {
     // The nounders DAO address (creators org)
@@ -48,8 +49,14 @@ contract NounsToken is INounsToken, Ownable, ERC721Checkpointable {
     // Whether the seeder can be updated
     bool public isSeederLocked;
 
+    // Whether the airdropped addresses can claim
+    bool public airdropClaimable;
+
     // The noun seeds
     mapping(uint256 => INounsSeeder.Seed) public seeds;
+
+    // The redeemed amounts, tracks how many nfts an airdrop address has minted
+    mapping(address => uint256) public redeemed; 
 
     // The internal noun ID tracker
     uint256 private _currentNounId;
@@ -59,6 +66,8 @@ contract NounsToken is INounsToken, Ownable, ERC721Checkpointable {
 
     // OpenSea's Proxy Registry
     IProxyRegistry public immutable proxyRegistry;
+
+    bytes32 immutable public root;
 
     /**
      * @notice Require that the minter has not been locked.
@@ -105,13 +114,16 @@ contract NounsToken is INounsToken, Ownable, ERC721Checkpointable {
         address _minter,
         INounsDescriptorMinimal _descriptor,
         INounsSeeder _seeder,
-        IProxyRegistry _proxyRegistry
+        IProxyRegistry _proxyRegistry,
+        bytes32 merkleroot
     ) ERC721('Nouns', 'NOUN') {
         noundersDAO = _noundersDAO;
         minter = _minter;
         descriptor = _descriptor;
         seeder = _seeder;
         proxyRegistry = _proxyRegistry;
+        airdropClaimable = true;
+        root = merkleroot;
     }
 
     /**
@@ -151,6 +163,23 @@ contract NounsToken is INounsToken, Ownable, ERC721Checkpointable {
             _mintTo(noundersDAO, _currentNounId++);
         }
         return _mintTo(minter, _currentNounId++);
+    }
+
+    function setAirdropClaimable(bool claimable) public override onlyMinter {
+        airdropClaimable = claimable;
+    }
+
+
+    function redeem(address to, uint256 maxRedeemAmount, uint256 redeemAmount, bytes32[] calldata proof) public {
+        require(airdropClaimable == true, "Redeem airdrop paused");
+        require(redeemAmount > 0,"Nonzero redeemAmount required");
+        require(_verify(_leaf(msg.sender, maxRedeemAmount), proof), "Invalid merkle proof or leaf");
+        require(redeemed[msg.sender] + redeemAmount <= maxRedeemAmount, "Total redeem will exceed max redeem amount");
+        redeemed[msg.sender] += redeemAmount;
+
+        for (uint i = 0; i < redeemAmount; i++) {
+            _mintTo(to, _currentNounId++);
+        }
     }
 
     /**
@@ -259,5 +288,16 @@ contract NounsToken is INounsToken, Ownable, ERC721Checkpointable {
         emit NounCreated(nounId, seed);
 
         return nounId;
+    }
+
+    function _leaf(address account, uint256 maxRedeemAmount) internal pure returns (bytes32)
+    {
+        // return keccak256(abi.encodePacked(maxRedeemAmount, account));
+        return keccak256(bytes.concat(keccak256(abi.encode(account, maxRedeemAmount))));
+    }
+
+    function _verify(bytes32 leaf, bytes32[] memory proof) internal view returns (bool)
+    {
+        return MerkleProof.verify(proof, root, leaf);
     }
 }
