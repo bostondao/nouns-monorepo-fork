@@ -532,7 +532,7 @@ function dataToDescriptorInput(data: string[]): {
 }
 
 export const generateMerkleTree = (values: any[][]): StandardMerkleTree<any> => {
-    return StandardMerkleTree.of(values, ["address", "uint256"])
+    return StandardMerkleTree.of(values, ["address"])
 };
 
 export const generateMerkleProof = (tree: StandardMerkleTree<any>, address: string): string[] => {

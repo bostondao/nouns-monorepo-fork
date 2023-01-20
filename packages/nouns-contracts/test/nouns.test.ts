@@ -3,9 +3,10 @@ import { ethers } from 'hardhat';
 import { BigNumber as EthersBN, constants } from 'ethers';
 import { solidity } from 'ethereum-waffle';
 import { NounsDescriptorV2__factory as NounsDescriptorV2Factory, NounsToken } from '../typechain';
-import { deployNounsToken, populateDescriptorV2, generateMerkleTree, generateMerkleProof} from './utils';
+import { deployNounsToken, populateDescriptorV2} from './utils';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
+import { generateMerkleTree, generateMerkleProof} from '../src/merkleAirdrop';
 
 chai.use(solidity);
 const { expect } = chai;
@@ -18,7 +19,7 @@ describe('NounsToken', () => {
   let tree: StandardMerkleTree<any>;
   before(async () => {
     [deployer, noundersDAO] = await ethers.getSigners();
-    tree = generateMerkleTree([[deployer.address, "1"], [noundersDAO.address, "10"]]);
+    tree = generateMerkleTree([[deployer.address], [noundersDAO.address]]);
     nounsToken = await deployNounsToken(deployer, noundersDAO.address, deployer.address,undefined,undefined,undefined,tree.root);
 
     const descriptor = await nounsToken.descriptor();
@@ -132,25 +133,20 @@ describe('NounsToken', () => {
     await expect(account0AsNounErc721Account.setAirdropClaimable(false)).to.be.reverted;
   });
 
-  it('should allow redeemer to redeem all', async () => {
+  it('should allow redeemer to redeem', async () => {
       let proof = generateMerkleProof(tree, deployer.address);
-      await expect(nounsToken.redeem(deployer.address, 0, 0, proof)).to.be.revertedWith('Nonzero redeemAmount required')
-      await expect(nounsToken.redeem(deployer.address, 0, 1, proof)).to.be.revertedWith('Invalid merkle proof or leaf')
-      await expect(nounsToken.redeem(deployer.address, 2, 1, proof)).to.be.revertedWith('Invalid merkle proof or leaf')
-      await expect(nounsToken.redeem(deployer.address, 2, 2, proof)).to.be.revertedWith('Invalid merkle proof or leaf')
-      await expect(nounsToken.redeem(deployer.address, 1, 0, proof)).to.be.revertedWith('Nonzero redeemAmount required') 
-      await expect(nounsToken.redeem(deployer.address, 1, 2, proof)).to.be.revertedWith('Total redeem will exceed max redeem amount')
-      await (await nounsToken.redeem(deployer.address, 1, 1, proof)).wait();
-      await expect(nounsToken.redeem(deployer.address, 1, 1, proof)).to.be.revertedWith('Total redeem will exceed max redeem amount')
+      await (await nounsToken.setAirdropClaimable(false)).wait();
+      await expect(nounsToken.redeem(deployer.address, proof)).to.be.revertedWith('Redeem airdrop paused')
+      await (await nounsToken.setAirdropClaimable(true)).wait();
+      await (await nounsToken.redeem(deployer.address, proof)).wait();
+      await expect(nounsToken.redeem(deployer.address, proof)).to.be.revertedWith('Already redeemed')
 
       let dao_proof = generateMerkleProof(tree, noundersDAO.address);
       const account0AsNounErc721Account = nounsToken.connect(noundersDAO);
-      await expect(nounsToken.redeem(deployer.address, 10, 2, dao_proof)).to.be.revertedWith('Invalid merkle proof or leaf')
-      await expect(account0AsNounErc721Account.redeem(noundersDAO.address, 10, 2, proof)).to.be.revertedWith('Invalid merkle proof or leaf')
-      await (await account0AsNounErc721Account.redeem(noundersDAO.address, 10, 2, dao_proof)).wait();
-      await (await account0AsNounErc721Account.redeem(deployer.address, 10, 3, dao_proof)).wait();
-      await expect(account0AsNounErc721Account.redeem(noundersDAO.address, 10, 6, dao_proof)).to.be.revertedWith('Total redeem will exceed max redeem amount')
-      await (await account0AsNounErc721Account.redeem(noundersDAO.address, 10, 5, dao_proof)).wait();
+      await expect(nounsToken.redeem(deployer.address, dao_proof)).to.be.revertedWith('Invalid merkle proof or leaf')
+      await expect(account0AsNounErc721Account.redeem(noundersDAO.address, proof)).to.be.revertedWith('Invalid merkle proof or leaf')
+      await (await account0AsNounErc721Account.redeem(noundersDAO.address, dao_proof)).wait();
+      await expect(account0AsNounErc721Account.redeem(noundersDAO.address, dao_proof)).to.be.revertedWith('Already redeemed')
   });
 
   describe('contractURI', async () => {

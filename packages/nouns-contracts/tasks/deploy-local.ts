@@ -3,6 +3,8 @@ import { task, types } from 'hardhat/config';
 import { Interface, parseUnits } from 'ethers/lib/utils';
 import { Contract as EthersContract } from 'ethers';
 import { ContractName } from './types';
+import { generateMerkleTree, generateMerkleProof} from '../src/merkleAirdrop';
+import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
 
 type LocalContractName =
   | Exclude<ContractName, 'NounsDAOLogicV1' | 'NounsDAOProxy'>
@@ -78,6 +80,9 @@ task('deploy-local', 'Deploy contracts to hardhat')
       from: deployer.address,
       nonce: nonce + NOUNS_DAO_EXECUTOR_NONCE_OFFSET,
     });
+
+    let tree = generateMerkleTree([[deployer.address]]);
+
     const contracts: Record<LocalContractName, Contract> = {
       WETH: {},
       NFTDescriptorV2: {},
@@ -103,6 +108,7 @@ task('deploy-local', 'Deploy contracts to hardhat')
           () => contracts.NounsDescriptorV2.instance?.address,
           () => contracts.NounsSeeder.instance?.address,
           proxyRegistryAddress,
+          tree.root,
         ],
       },
       NounsAuctionHouse: {

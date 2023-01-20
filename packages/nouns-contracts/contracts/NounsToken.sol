@@ -56,7 +56,7 @@ contract NounsToken is INounsToken, Ownable, ERC721Checkpointable {
     mapping(uint256 => INounsSeeder.Seed) public seeds;
 
     // The redeemed amounts, tracks how many nfts an airdrop address has minted
-    mapping(address => uint256) public redeemed; 
+    mapping(address => bool) public redeemed; 
 
     // The internal noun ID tracker
     uint256 private _currentNounId;
@@ -170,16 +170,13 @@ contract NounsToken is INounsToken, Ownable, ERC721Checkpointable {
     }
 
 
-    function redeem(address to, uint256 maxRedeemAmount, uint256 redeemAmount, bytes32[] calldata proof) public {
+    function redeem(address to, bytes32[] calldata proof) public {
         require(airdropClaimable == true, "Redeem airdrop paused");
-        require(redeemAmount > 0,"Nonzero redeemAmount required");
-        require(_verify(_leaf(msg.sender, maxRedeemAmount), proof), "Invalid merkle proof or leaf");
-        require(redeemed[msg.sender] + redeemAmount <= maxRedeemAmount, "Total redeem will exceed max redeem amount");
-        redeemed[msg.sender] += redeemAmount;
+        require(_verify(_leaf(msg.sender), proof), "Invalid merkle proof or leaf");
+        require(redeemed[msg.sender] == false, "Already redeemed");
+        redeemed[msg.sender] = true;
 
-        for (uint i = 0; i < redeemAmount; i++) {
-            _mintTo(to, _currentNounId++);
-        }
+        _mintTo(to, _currentNounId++);
     }
 
     /**
@@ -290,10 +287,9 @@ contract NounsToken is INounsToken, Ownable, ERC721Checkpointable {
         return nounId;
     }
 
-    function _leaf(address account, uint256 maxRedeemAmount) internal pure returns (bytes32)
+    function _leaf(address account) internal pure returns (bytes32)
     {
-        // return keccak256(abi.encodePacked(maxRedeemAmount, account));
-        return keccak256(bytes.concat(keccak256(abi.encode(account, maxRedeemAmount))));
+        return keccak256(bytes.concat(keccak256(abi.encode(account))));
     }
 
     function _verify(bytes32 leaf, bytes32[] memory proof) internal view returns (bool)

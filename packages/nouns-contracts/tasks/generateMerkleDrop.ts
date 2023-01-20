@@ -7,15 +7,17 @@ import * as airdropJson from '../files/airdrop.json';
 
 task('generate-merkle-drop', 'Generates the merkle airdrop root and json')
   .setAction(async () => {
-    // (1)
     const values = airdropJson.airdrop
-    // (2)
-    const tree = StandardMerkleTree.of(values, ["address", "uint256"]);
+    const tree = StandardMerkleTree.of(values, ["address"]);
 
-    // (3)
     console.log('Merkle Root:', tree.root);
-
-    // (4)
     fs.writeFileSync("tree.json", JSON.stringify(tree.dump()));
-  });
 
+    let proofs: any = {};
+
+    for (const [i, v] of tree.entries()) {
+      proofs[v[0]] = tree.getProof(i);
+    }
+
+    fs.writeFileSync("proof.json", JSON.stringify(proofs));
+})
