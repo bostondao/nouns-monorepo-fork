@@ -114,7 +114,7 @@ describe('NounsToken', () => {
     await expect(account0AsNounErc721Account.mint()).to.be.reverted;
   });
 
-  it('should allow minter to pause claimability', async () => {
+  it('should allow owner to pause claimability', async () => {
     await expect(await nounsToken.airdropClaimable()).to.equal(true);
     await (await nounsToken.setAirdropClaimable(true)).wait();
     await expect(await nounsToken.airdropClaimable()).to.equal(true);
@@ -126,7 +126,7 @@ describe('NounsToken', () => {
     await expect(await nounsToken.airdropClaimable()).to.equal(true);
   });
 
-  it('should revert on non-minter pausing claimability', async () => {
+  it('should revert on non-owner pausing claimability', async () => {
     await expect(await nounsToken.airdropClaimable()).to.equal(true);
     const account0AsNounErc721Account = nounsToken.connect(noundersDAO);
     await expect(account0AsNounErc721Account.setAirdropClaimable(true)).to.be.reverted;

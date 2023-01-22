@@ -75,9 +75,9 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
         __ReentrancyGuard_init();
         __Ownable_init();
 
-        nouns = _nouns;
         _pause();
 
+        nouns = _nouns;
         weth = _weth;
         timeBuffer = _timeBuffer;
         reservePrice = _reservePrice;
@@ -282,15 +282,4 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
         (bool success, ) = to.call{ value: value, gas: 30_000 }(new bytes(0));
         return success;
     }
-
-    function _pause() internal override {
-        super._pause();
-        address(nouns).call(abi.encodeWithSignature('setAirdropClaimable(bool)',true));
-    }
-
-    function _unpause() internal override {
-        super._unpause();
-        address(nouns).call(abi.encodeWithSignature('setAirdropClaimable(bool)',false));
-    }
-
 }

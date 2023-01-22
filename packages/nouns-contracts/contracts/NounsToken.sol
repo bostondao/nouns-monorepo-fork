@@ -165,7 +165,7 @@ contract NounsToken is INounsToken, Ownable, ERC721Checkpointable {
         return _mintTo(minter, _currentNounId++);
     }
 
-    function setAirdropClaimable(bool claimable) public override onlyMinter {
+    function setAirdropClaimable(bool claimable) public override onlyOwner {
         airdropClaimable = claimable;
     }
 
