@@ -65,8 +65,7 @@ const app: Record<SupportedChains, AppConfig> = {
   [ChainId.Goerli]: {
     jsonRpcUri: createNetworkHttpUrl('goerli'),
     wsRpcUri: createNetworkWsUrl('goerli'),
-    subgraphApiUri:
-      'https://api.goldsky.com/api/public/project_cldf2o9pqagp43svvbk5u3kmo/subgraphs/nouns-goerli/0.1.0/gn',
+    subgraphApiUri: 'https://api.thegraph.com/subgraphs/name/colink14110476/bdgoerli',
     enableHistory: process.env.REACT_APP_ENABLE_HISTORY === 'true',
   },
   [ChainId.Mainnet]: {
