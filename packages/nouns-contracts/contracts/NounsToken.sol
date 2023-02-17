@@ -115,7 +115,7 @@ contract NounsToken is INounsToken, Ownable, ERC721Checkpointable {
         INounsDescriptorMinimal _descriptor,
         INounsSeeder _seeder,
         IProxyRegistry _proxyRegistry,
-        bytes32 merkleroot
+        bytes32 _merkleroot
     ) ERC721('Nouns', 'NOUN') {
         noundersDAO = _noundersDAO;
         minter = _minter;
@@ -123,7 +123,7 @@ contract NounsToken is INounsToken, Ownable, ERC721Checkpointable {
         seeder = _seeder;
         proxyRegistry = _proxyRegistry;
         airdropClaimable = true;
-        root = merkleroot;
+        root = _merkleroot;
     }
 
     /**
