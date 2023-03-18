@@ -61,6 +61,12 @@ task(
     types.int,
   ) // Default: 40%
   .addOptionalParam('quorumCoefficient', 'Dynamic quorum coefficient (float)', 1, types.float)
+  .addOptionalParam(
+    'root',
+    'The airdrop root',
+    '',
+    types.string,
+  )
   .setAction(async (args, { run }) => {
     // Deploy the Nouns DAO contracts and return deployment information
     const contracts = await run('deploy-short-times', args);
