@@ -346,5 +346,4 @@ describe('NounsAuctionHouse', () => {
     const tx = nounsAuctionHouse.connect(bidderA).setDuration(prevDuration.add(1));
     await expect(tx).to.be.revertedWith("Caller is not bravo or owner");
   });
-
 });

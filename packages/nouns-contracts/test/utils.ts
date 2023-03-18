@@ -34,6 +34,8 @@ import { chunkArray } from '../utils';
 import { MAX_QUORUM_VOTES_BPS, MIN_QUORUM_VOTES_BPS } from './constants';
 import { DynamicQuorumParams } from './types';
 import { BigNumber } from 'ethers';
+import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
+import fs from "fs";
 
 export type TestSigners = {
   deployer: SignerWithAddress;
@@ -108,6 +110,7 @@ export const deployNounsToken = async (
   descriptor?: string,
   seeder?: string,
   proxyRegistryAddress?: string,
+  root?: string
 ): Promise<NounsToken> => {
   const signer = deployer || (await getSigners()).deployer;
   const factory = new NounsTokenFactory(signer);
@@ -118,6 +121,7 @@ export const deployNounsToken = async (
     descriptor || (await deployNounsDescriptorV2(signer)).address,
     seeder || (await deployNounsSeeder(signer)).address,
     proxyRegistryAddress || address(0),
+    root || '0x0000000000000000000000000000000000000000000000000000000000000000'
   );
 };
 

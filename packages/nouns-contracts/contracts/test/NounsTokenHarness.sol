@@ -16,7 +16,7 @@ contract NounsTokenHarness is NounsToken {
         INounsDescriptorMinimal descriptor,
         INounsSeeder seeder,
         IProxyRegistry proxyRegistry
-    ) NounsToken(noundersDAO, minter, descriptor, seeder, proxyRegistry) {}
+    ) NounsToken(noundersDAO, minter, descriptor, seeder, proxyRegistry, bytes32(0)) {}
 
     function mintTo(address to) public {
         _mintTo(to, currentNounId++);

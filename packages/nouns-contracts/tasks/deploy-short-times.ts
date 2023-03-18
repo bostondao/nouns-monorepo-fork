@@ -79,6 +79,12 @@ task('deploy-short-times', 'Deploy all Nouns contracts with short gov times for 
     types.int,
   ) // Default: 40%
   .addOptionalParam('quorumCoefficient', 'Dynamic quorum coefficient (float)', 1, types.float)
+  .addOptionalParam(
+    'root',
+    'The airdrop root',
+    '',
+    types.string,
+  )
   .setAction(async (args, { ethers }) => {
     const network = await ethers.provider.getNetwork();
     const [deployer] = await ethers.getSigners();
@@ -144,6 +150,7 @@ task('deploy-short-times', 'Deploy all Nouns contracts with short gov times for 
           () => deployment.NounsDescriptorV2.address,
           () => deployment.NounsSeeder.address,
           proxyRegistryAddress,
+          args.root,
         ],
       },
       NounsAuctionHouse: {

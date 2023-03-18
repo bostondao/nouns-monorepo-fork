@@ -3,8 +3,10 @@ import { ethers } from 'hardhat';
 import { BigNumber as EthersBN, constants } from 'ethers';
 import { solidity } from 'ethereum-waffle';
 import { NounsDescriptorV2__factory as NounsDescriptorV2Factory, NounsToken } from '../typechain';
-import { deployNounsToken, populateDescriptorV2 } from './utils';
+import { deployNounsToken, populateDescriptorV2} from './utils';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
+import { generateMerkleTree, generateMerkleProof} from '../src/merkleAirdrop';
 
 chai.use(solidity);
 const { expect } = chai;
@@ -14,10 +16,11 @@ describe('NounsToken', () => {
   let deployer: SignerWithAddress;
   let noundersDAO: SignerWithAddress;
   let snapshotId: number;
-
+  let tree: StandardMerkleTree<any>;
   before(async () => {
     [deployer, noundersDAO] = await ethers.getSigners();
-    nounsToken = await deployNounsToken(deployer, noundersDAO.address, deployer.address);
+    tree = generateMerkleTree([[deployer.address], [noundersDAO.address]]);
+    nounsToken = await deployNounsToken(deployer, noundersDAO.address, deployer.address,undefined,undefined,undefined,tree.root);
 
     const descriptor = await nounsToken.descriptor();
 
@@ -109,6 +112,41 @@ describe('NounsToken', () => {
   it('should revert on non-minter mint', async () => {
     const account0AsNounErc721Account = nounsToken.connect(noundersDAO);
     await expect(account0AsNounErc721Account.mint()).to.be.reverted;
+  });
+
+  it('should allow owner to pause claimability', async () => {
+    await expect(await nounsToken.airdropClaimable()).to.equal(true);
+    await (await nounsToken.setAirdropClaimable(true)).wait();
+    await expect(await nounsToken.airdropClaimable()).to.equal(true);
+    await (await nounsToken.setAirdropClaimable(false)).wait();
+    await expect(await nounsToken.airdropClaimable()).to.equal(false);
+    await (await nounsToken.setAirdropClaimable(false)).wait();
+    await expect(await nounsToken.airdropClaimable()).to.equal(false);
+    await (await nounsToken.setAirdropClaimable(true)).wait();
+    await expect(await nounsToken.airdropClaimable()).to.equal(true);
+  });
+
+  it('should revert on non-owner pausing claimability', async () => {
+    await expect(await nounsToken.airdropClaimable()).to.equal(true);
+    const account0AsNounErc721Account = nounsToken.connect(noundersDAO);
+    await expect(account0AsNounErc721Account.setAirdropClaimable(true)).to.be.reverted;
+    await expect(account0AsNounErc721Account.setAirdropClaimable(false)).to.be.reverted;
+  });
+
+  it('should allow redeemer to redeem', async () => {
+      let proof = generateMerkleProof(tree, deployer.address);
+      await (await nounsToken.setAirdropClaimable(false)).wait();
+      await expect(nounsToken.redeem(deployer.address, proof)).to.be.revertedWith('Redeem airdrop paused')
+      await (await nounsToken.setAirdropClaimable(true)).wait();
+      await (await nounsToken.redeem(deployer.address, proof)).wait();
+      await expect(nounsToken.redeem(deployer.address, proof)).to.be.revertedWith('Already redeemed')
+
+      let dao_proof = generateMerkleProof(tree, noundersDAO.address);
+      const account0AsNounErc721Account = nounsToken.connect(noundersDAO);
+      await expect(nounsToken.redeem(deployer.address, dao_proof)).to.be.revertedWith('Invalid merkle proof or leaf')
+      await expect(account0AsNounErc721Account.redeem(noundersDAO.address, proof)).to.be.revertedWith('Invalid merkle proof or leaf')
+      await (await account0AsNounErc721Account.redeem(noundersDAO.address, dao_proof)).wait();
+      await expect(account0AsNounErc721Account.redeem(noundersDAO.address, dao_proof)).to.be.revertedWith('Already redeemed')
   });
 
   describe('contractURI', async () => {
