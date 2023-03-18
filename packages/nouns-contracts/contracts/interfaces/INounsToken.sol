@@ -59,4 +59,8 @@ interface INounsToken is IERC721 {
     function setSeeder(INounsSeeder seeder) external;
 
     function lockSeeder() external;
+
+    function setAirdropClaimable(bool claimable) external;
+
+    function minter() external returns (address);
 }
