@@ -2,7 +2,7 @@ import classes from './Airdrop.module.css';
 import Section from '../../layout/Section';
 import { Col, Row, Card, Button } from 'react-bootstrap';
 import React from 'react';
-import { useIsAirdropClaimable, useRedeem } from '../../wrappers/nounToken';
+import { useIsAirdropClaimable } from '../../wrappers/nounToken';
 
 const AirdropPage: React.FC<{}> = props => {
   return (

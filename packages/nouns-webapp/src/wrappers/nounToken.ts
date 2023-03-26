@@ -196,14 +196,3 @@ export const useIsAirdropClaimable = (): boolean => {
 
   return claimable ?? false;
 }
-
-export const useRedeem = (address: string, proof: string): boolean => {
-  const [success] = useContractCall<[any]>({
-    abi,
-    address: config.addresses.nounsToken,
-    method: 'redeem',
-    args: [address, proof]
-  }) || [];
-
-  return success
-}
