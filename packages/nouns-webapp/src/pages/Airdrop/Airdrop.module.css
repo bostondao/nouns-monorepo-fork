@@ -1,0 +1,47 @@
+.cardTitle {
+  color: var(--brand-dark-green);
+  font-family: 'PT Root UI';
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.cardSubtitle {
+  color: var(--brand-dark-green);
+  font-family: 'PT Root UI';
+}
+
+.boldText {
+  font-family: 'PT Root UI';
+  font-weight: bold;
+}
+
+.boldHyperLink {
+  font-family: 'PT Root UI';
+  font-weight: bold;
+  color: var(--brand-dark-green);
+}
+
+.claimBtn {
+  max-width: 10rem;
+  height: 3rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  border-radius: 12px;
+  background-color: var(--brand-color-green);
+  border: var(--brand-color-green);
+}
+
+.claimBtn:focus,
+.claimBtn:hover {
+  background-color: var(--brand-color-green) !important;
+  box-shadow: 0 0 0 0.2rem rgb(67, 179, 105, 0.75);
+}
+
+.claimBtn:active {
+  background-color: var(--brand-color-green) !important;
+}
+
+.card {
+  height: 340px;
+  margin-top: 1rem;
+}
