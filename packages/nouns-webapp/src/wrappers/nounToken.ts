@@ -185,3 +185,14 @@ export const useUserNounTokenBalance = (): number | undefined => {
     }) || [];
   return tokenBalance?.toNumber();
 };
+
+export const useIsAirdropClaimable = (): boolean => {
+  const claimable = useContractCall<boolean>({
+    abi,
+    address: config.addresses.nounsToken,
+    method: 'airdropClaimable',
+    args: [],
+  });
+
+  return claimable ?? false;
+}

@@ -12,6 +12,7 @@ import { ExternalURL, externalURL } from '../../utils/externalURL';
 import NavBarButton, { NavBarButtonStyle } from '../NavBarButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookOpen } from '@fortawesome/free-solid-svg-icons';
+import { faParachuteBox } from '@fortawesome/free-solid-svg-icons';
 import { faUsers } from '@fortawesome/free-solid-svg-icons';
 import { faComments } from '@fortawesome/free-solid-svg-icons';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
@@ -47,8 +48,8 @@ const NavBar = () => {
   const nonWalletButtonStyle = !useStateBg
     ? NavBarButtonStyle.WHITE_INFO
     : isCool
-    ? NavBarButtonStyle.COOL_INFO
-    : NavBarButtonStyle.WARM_INFO;
+      ? NavBarButtonStyle.COOL_INFO
+      : NavBarButtonStyle.WARM_INFO;
 
   const closeNav = () => setIsNavExpanded(false);
 
@@ -60,7 +61,7 @@ const NavBar = () => {
         className={classes.navBarCustom}
         expanded={isNavExpanded}
       >
-        <Container style={{ maxWidth: 'unset' }}>
+        <Container fluid style={{ maxWidth: 'unset' }}>
           <div className={classes.brandAndTreasuryWrapper}>
             <Navbar.Brand as={Link} to="/" className={classes.navBarBrand}>
               <div className={classes.navBarLogo}>
@@ -95,6 +96,13 @@ const NavBar = () => {
             onClick={() => setIsNavExpanded(!isNavExpanded)}
           />
           <Navbar.Collapse className="justify-content-end">
+            <Nav.Link as={Link} to="/airdrop" className={classes.nounsNavLink} onClick={closeNav}>
+              <NavBarButton
+                buttonText={<Trans>Airdrop</Trans>}
+                buttonIcon={<FontAwesomeIcon icon={faParachuteBox} />}
+                buttonStyle={nonWalletButtonStyle}
+              />
+            </Nav.Link>
             <Nav.Link as={Link} to="/vote" className={classes.nounsNavLink} onClick={closeNav}>
               <NavBarButton
                 buttonText={<Trans>DAO</Trans>}
