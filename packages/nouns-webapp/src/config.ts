@@ -10,6 +10,8 @@ interface ExternalContractAddresses {
   chainlinkEthUsdc: string | undefined;
   payerContract: string | undefined;
   tokenBuyer: string | undefined;
+  nounsStreamFactory: string | undefined;
+  weth: string | undefined;
 }
 
 export type ContractAddresses = NounsContractAddresses & ExternalContractAddresses;
@@ -21,7 +23,7 @@ interface AppConfig {
   enableHistory: boolean;
 }
 
-type SupportedChains = ChainId.Rinkeby | ChainId.Mainnet | ChainId.Hardhat | ChainId.Goerli;
+type SupportedChains = ChainId.Mainnet | ChainId.Hardhat | ChainId.Goerli;
 
 interface CacheBucket {
   name: string;
@@ -60,12 +62,6 @@ export const createNetworkWsUrl = (network: string): string => {
 };
 
 const app: Record<SupportedChains, AppConfig> = {
-  [ChainId.Rinkeby]: {
-    jsonRpcUri: createNetworkHttpUrl('rinkeby'),
-    wsRpcUri: createNetworkWsUrl('rinkeby'),
-    subgraphApiUri: 'https://api.thegraph.com/subgraphs/name/nounsdao/nouns-subgraph-rinkeby-v5',
-    enableHistory: process.env.REACT_APP_ENABLE_HISTORY === 'true',
-  },
   [ChainId.Goerli]: {
     jsonRpcUri: createNetworkHttpUrl('goerli'),
     wsRpcUri: createNetworkWsUrl('goerli'),
@@ -75,7 +71,8 @@ const app: Record<SupportedChains, AppConfig> = {
   [ChainId.Mainnet]: {
     jsonRpcUri: createNetworkHttpUrl('mainnet'),
     wsRpcUri: createNetworkWsUrl('mainnet'),
-    subgraphApiUri: 'https://api.thegraph.com/subgraphs/name/nounsdao/nouns-subgraph',
+    subgraphApiUri:
+      'https://api.goldsky.com/api/public/project_cldf2o9pqagp43svvbk5u3kmo/subgraphs/nouns/0.1.0/gn',
     enableHistory: process.env.REACT_APP_ENABLE_HISTORY === 'true',
   },
   [ChainId.Hardhat]: {
@@ -87,19 +84,14 @@ const app: Record<SupportedChains, AppConfig> = {
 };
 
 const externalAddresses: Record<SupportedChains, ExternalContractAddresses> = {
-  [ChainId.Rinkeby]: {
-    lidoToken: '0xF4242f9d78DB7218Ad72Ee3aE14469DBDE8731eD',
-    usdcToken: '0xeb8f08a975Ab53E34D8a0330E0D34de942C95926',
-    payerContract: undefined,
-    tokenBuyer: undefined,
-    chainlinkEthUsdc: undefined,
-  },
   [ChainId.Goerli]: {
     lidoToken: '0x2DD6530F136D2B56330792D46aF959D9EA62E276',
     usdcToken: '0x07865c6e87b9f70255377e024ace6630c1eaa37f',
+    weth: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
     payerContract: '0xD4A3bf1dF54699E63A2ef7F490E8E22b27B945f0',
     tokenBuyer: '0x61Ec4584c5B5eBaaD9f21Aac491fBB5B2ff30779',
     chainlinkEthUsdc: undefined,
+    nounsStreamFactory: '0xc08a287eCB16CeD801f28Bb011924f7DE5Cc53a3',
   },
   [ChainId.Mainnet]: {
     lidoToken: '0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84',
@@ -107,6 +99,8 @@ const externalAddresses: Record<SupportedChains, ExternalContractAddresses> = {
     chainlinkEthUsdc: '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419',
     payerContract: '0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D',
     tokenBuyer: '0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5',
+    weth: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+    nounsStreamFactory: '0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff',
   },
   [ChainId.Hardhat]: {
     lidoToken: undefined,
@@ -114,6 +108,8 @@ const externalAddresses: Record<SupportedChains, ExternalContractAddresses> = {
     payerContract: undefined,
     tokenBuyer: undefined,
     chainlinkEthUsdc: undefined,
+    weth: undefined,
+    nounsStreamFactory: undefined,
   },
 };
 
@@ -132,4 +128,4 @@ const config = {
 
 export default config;
 
-export const multicallOnLocalhost = '0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e';
+export const multicallOnLocalhost = '0x9A676e781A523b5d0C0e43731313A708CB607508';

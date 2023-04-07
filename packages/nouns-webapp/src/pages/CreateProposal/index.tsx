@@ -41,22 +41,30 @@ const CreateProposalPage = () => {
 
   const [totalUSDCPayment, setTotalUSDCPayment] = useState<number>(0);
   const [tokenBuyerTopUpEth, setTokenBuyerTopUpETH] = useState<string>('0');
-  const ethNeeded = useEthNeeded(config.addresses.tokenBuyer ?? '', totalUSDCPayment);
+  const ethNeeded = useEthNeeded(
+    config.addresses.tokenBuyer ?? '',
+    totalUSDCPayment,
+    config.addresses.tokenBuyer === undefined || totalUSDCPayment === 0,
+  );
 
   const handleAddProposalAction = useCallback(
-    (transaction: ProposalTransaction) => {
-      if (!transaction.address.startsWith('0x')) {
-        transaction.address = `0x${transaction.address}`;
-      }
-      if (!transaction.calldata.startsWith('0x')) {
-        transaction.calldata = `0x${transaction.calldata}`;
-      }
+    (transactions: ProposalTransaction | ProposalTransaction[]) => {
+      const transactionsArray = Array.isArray(transactions) ? transactions : [transactions];
 
-      if (transaction.usdcValue) {
-        setTotalUSDCPayment(totalUSDCPayment + transaction.usdcValue);
-      }
+      transactionsArray.forEach(transaction => {
+        if (!transaction.address.startsWith('0x')) {
+          transaction.address = `0x${transaction.address}`;
+        }
+        if (!transaction.calldata.startsWith('0x')) {
+          transaction.calldata = `0x${transaction.calldata}`;
+        }
 
-      setProposalTransactions([...proposalTransactions, transaction]);
+        if (transaction.usdcValue) {
+          setTotalUSDCPayment(totalUSDCPayment + transaction.usdcValue);
+        }
+      });
+      setProposalTransactions([...proposalTransactions, ...transactionsArray]);
+
       setShowTransactionFormModal(false);
     },
     [proposalTransactions, totalUSDCPayment],
@@ -71,7 +79,7 @@ const CreateProposalPage = () => {
   );
 
   useEffect(() => {
-    if (ethNeeded !== undefined && ethNeeded !== tokenBuyerTopUpEth) {
+    if (ethNeeded !== undefined && ethNeeded !== tokenBuyerTopUpEth && totalUSDCPayment > 0) {
       const hasTokenBuyterTopTop =
         proposalTransactions.filter(txn => txn.address === config.addresses.tokenBuyer).length > 0;
 
@@ -112,6 +120,7 @@ const CreateProposalPage = () => {
     handleRemoveProposalAction,
     proposalTransactions,
     tokenBuyerTopUpEth,
+    totalUSDCPayment,
   ]);
 
   const handleTitleInput = useCallback(
@@ -215,7 +224,7 @@ const CreateProposalPage = () => {
           <Trans>
             Add one or more proposal actions and describe your proposal for the community. The
             proposal cannot be modified after submission, so please verify all information before
-            submitting. The voting period will begin after 2 days and last for 5 days.
+            submitting. The voting period will begin after 5 days and last for 5 days.
           </Trans>
           <br />
           <br />

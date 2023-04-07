@@ -2,6 +2,7 @@ import { Row, Col, Button, Card, Spinner } from 'react-bootstrap';
 import Section from '../../layout/Section';
 import {
   ProposalState,
+  useCancelProposal,
   useCurrentQuorum,
   useExecuteProposal,
   useProposal,
@@ -10,7 +11,7 @@ import {
 import { useUserVotesAsOfBlock } from '../../wrappers/nounToken';
 import classes from './Vote.module.css';
 import { RouteComponentProps } from 'react-router-dom';
-import { TransactionStatus, useBlockNumber } from '@usedapp/core';
+import { TransactionStatus, useBlockNumber, useEthers } from '@usedapp/core';
 import { AlertModal, setAlertModal } from '../../state/slices/application';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -40,6 +41,9 @@ import { SearchIcon } from '@heroicons/react/solid';
 import ReactTooltip from 'react-tooltip';
 import DynamicQuorumInfoModal from '../../components/DynamicQuorumInfoModal';
 import config from '../../config';
+import ShortAddress from '../../components/ShortAddress';
+import StreamWithdrawModal from '../../components/StreamWithdrawModal';
+import { parseStreamCreationCallData } from '../../utils/streamingPaymentUtils/streamingPaymentUtils';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -51,6 +55,7 @@ const VotePage = ({
   },
 }: RouteComponentProps<{ id: string }>) => {
   const proposal = useProposal(id);
+  const { account } = useEthers();
 
   const [showVoteModal, setShowVoteModal] = useState<boolean>(false);
   const [showDynamicQuorumInfoModal, setShowDynamicQuorumInfoModal] = useState<boolean>(false);
@@ -59,6 +64,15 @@ const VotePage = ({
 
   const [isQueuePending, setQueuePending] = useState<boolean>(false);
   const [isExecutePending, setExecutePending] = useState<boolean>(false);
+  const [isCancelPending, setCancelPending] = useState<boolean>(false);
+  const [showStreamWithdrawModal, setShowStreamWithdrawModal] = useState<boolean>(false);
+  const [streamWithdrawInfo, setStreamWithdrawInfo] = useState<{
+    streamAddress: string;
+    startTime: number;
+    endTime: number;
+    streamAmount: number;
+    tokenAddress: string;
+  } | null>(null);
 
   const dispatch = useAppDispatch();
   const setModal = useCallback((modal: AlertModal) => dispatch(setAlertModal(modal)), [dispatch]);
@@ -70,6 +84,7 @@ const VotePage = ({
 
   const { queueProposal, queueProposalState } = useQueueProposal();
   const { executeProposal, executeProposalState } = useExecuteProposal();
+  const { cancelProposal, cancelProposalState } = useCancelProposal();
 
   // Get and format date from data
   const timestamp = Date.now();
@@ -109,12 +124,28 @@ const VotePage = ({
   );
 
   const hasSucceeded = proposal?.status === ProposalState.SUCCEEDED;
+  const isInNonFinalState = [
+    ProposalState.PENDING,
+    ProposalState.ACTIVE,
+    ProposalState.SUCCEEDED,
+    ProposalState.QUEUED,
+  ].includes(proposal?.status!);
+  const isCancellable =
+    isInNonFinalState && proposal?.proposer?.toLowerCase() === account?.toLowerCase();
+
   const isAwaitingStateChange = () => {
     if (hasSucceeded) {
       return true;
     }
     if (proposal?.status === ProposalState.QUEUED) {
       return new Date() >= (proposal?.eta ?? Number.MAX_SAFE_INTEGER);
+    }
+    return false;
+  };
+
+  const isAwaitingDestructiveStateChange = () => {
+    if (isCancellable) {
+      return true;
     }
     return false;
   };
@@ -150,6 +181,17 @@ const VotePage = ({
         return executeProposal(proposal.id);
       }
     };
+  })();
+
+  const destructiveStateButtonAction = isCancellable ? <Trans>Cancel</Trans> : '';
+  const destructiveStateAction = (() => {
+    if (isCancellable) {
+      return () => {
+        if (proposal?.id) {
+          return cancelProposal(proposal.id);
+        }
+      };
+    }
   })();
 
   const onTransactionStateChange = useCallback(
@@ -217,6 +259,11 @@ const VotePage = ({
         setExecutePending,
       ),
     [executeProposalState, onTransactionStateChange, setModal],
+  );
+
+  useEffect(
+    () => onTransactionStateChange(cancelProposalState, 'Proposal Canceled!', setCancelPending),
+    [cancelProposalState, onTransactionStateChange, setModal],
   );
 
   const activeAccount = useAppSelector(state => state.account.activeAccount);
@@ -287,6 +334,11 @@ const VotePage = ({
           currentQuorum={currentQuorum}
         />
       )}
+      <StreamWithdrawModal
+        show={showStreamWithdrawModal}
+        onDismiss={() => setShowStreamWithdrawModal(false)}
+        {...streamWithdrawInfo}
+      />
       <VoteModal
         show={showVoteModal}
         onHide={() => setShowVoteModal(false)}
@@ -304,21 +356,77 @@ const VotePage = ({
         )}
       </Col>
       <Col lg={10} className={clsx(classes.proposal, classes.wrapper)}>
-        {isAwaitingStateChange() && (
+        {proposal.status === ProposalState.EXECUTED &&
+          proposal.details
+            .filter(txn => txn?.functionSig.includes('createStream'))
+            .map(txn => {
+              const parsedCallData = parseStreamCreationCallData(txn.callData);
+              if (parsedCallData.recipient.toLowerCase() !== account?.toLowerCase()) {
+                return <></>;
+              }
+
+              return (
+                <Row className={clsx(classes.section, classes.transitionStateButtonSection)}>
+                  <span className={classes.boldedLabel}>
+                    <Trans>Only visible to you</Trans>
+                  </span>
+                  <Col className="d-grid gap-4">
+                    <Button
+                      onClick={() => {
+                        setShowStreamWithdrawModal(true);
+                        setStreamWithdrawInfo({
+                          streamAddress: parsedCallData.streamAddress,
+                          startTime: parsedCallData.startTime,
+                          endTime: parsedCallData.endTime,
+                          streamAmount: parsedCallData.streamAmount,
+                          tokenAddress: parsedCallData.tokenAddress,
+                        });
+                      }}
+                      variant="primary"
+                      className={classes.transitionStateButton}
+                    >
+                      <Trans>
+                        Withdraw from Stream{' '}
+                        <ShortAddress address={parsedCallData.streamAddress ?? ''} />
+                      </Trans>
+                    </Button>
+                  </Col>
+                </Row>
+              );
+            })}
+
+        {(isAwaitingStateChange() || isAwaitingDestructiveStateChange()) && (
           <Row className={clsx(classes.section, classes.transitionStateButtonSection)}>
-            <Col className="d-grid">
-              <Button
-                onClick={moveStateAction}
-                disabled={isQueuePending || isExecutePending}
-                variant="dark"
-                className={classes.transitionStateButton}
-              >
-                {isQueuePending || isExecutePending ? (
-                  <Spinner animation="border" />
-                ) : (
-                  <Trans>{moveStateButtonAction} Proposal ⌐◧-◧</Trans>
-                )}
-              </Button>
+            <Col className="d-grid gap-4">
+              {isAwaitingStateChange() && (
+                <Button
+                  onClick={moveStateAction}
+                  disabled={isQueuePending || isExecutePending}
+                  variant="dark"
+                  className={classes.transitionStateButton}
+                >
+                  {isQueuePending || isExecutePending ? (
+                    <Spinner animation="border" />
+                  ) : (
+                    <Trans>{moveStateButtonAction} Proposal ⌐◧-◧</Trans>
+                  )}
+                </Button>
+              )}
+
+              {isAwaitingDestructiveStateChange() && (
+                <Button
+                  onClick={destructiveStateAction}
+                  disabled={isCancelPending}
+                  variant="danger"
+                  className={classes.destructiveTransitionStateButton}
+                >
+                  {isCancelPending ? (
+                    <Spinner animation="border" />
+                  ) : (
+                    <Trans>{destructiveStateButtonAction} Proposal ⌐◧-◧</Trans>
+                  )}
+                </Button>
+              )}
             </Col>
           </Row>
         )}
